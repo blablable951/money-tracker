@@ -337,11 +337,15 @@ input,button,.chip{-webkit-user-select:none;user-select:none;-webkit-touch-callo
   .chip.on:active{background:var(--text);color:var(--bg)}
 }
 
-/* mobile: readable day labels + comfortable tap targets */
+/* mobile: readable day labels, compact header, comfortable tap targets */
 @media (max-width:620px){
+  .head-right{flex-wrap:wrap;row-gap:2px;gap:2px}
+  .link{font-size:13px;padding:9px 6px}
+  .monthnav{margin-right:0}
+  .monthnav button{width:28px;height:28px}
+  #monthLabel{font-size:13px;min-width:96px}
   .day-num.dn-hide{display:none}
-  .link{padding:9px 10px}
-  .monthnav button{width:32px;height:32px}
+  .bars{overflow-x:clip}
   .filters button{padding:8px 11px}
   .chip{padding:8px 12px}
   .seg button{padding:8px 14px}

@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE = 'moneyflow-v1';
+const CACHE = 'moneyflow-v2';
 const ASSETS = [
   './',
   './index.html',
