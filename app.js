@@ -515,7 +515,9 @@ function init() {
 
   renderChips();
   renderAll();
-  document.getElementById('amount').focus();
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    document.getElementById('amount').focus();
+  }
 }
 
 init();
