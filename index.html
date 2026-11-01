@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0c0c0e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Money Flow">
+<meta name="format-detection" content="telephone=no">
+<title>Money Flow</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%230f0f11'/><circle cx='16' cy='16' r='5' fill='%23eae8e3'/></svg>">
+<link rel="stylesheet" href="styles.css">
+<script>
+  try {
+    var th = localStorage.getItem('moneyflow.theme');
+    if (th) document.documentElement.setAttribute('data-theme', th);
+  } catch (e) {}
+</script>
+</head>
+<body>
+
+<main class="shell">
+
+  <header class="head rise" style="--d:0ms">
+    <div class="mark"><span class="mark-dot"></span>Money Flow</div>
+    <div class="head-right">
+      <div class="monthnav">
+        <button id="prevM" aria-label="Предыдущий месяц">←</button>
+        <span id="monthLabel">—</span>
+        <button id="nextM" aria-label="Следующий месяц">→</button>
+      </div>
+      <button class="link" id="themeBtn">светлая</button>
+      <button class="link" id="exportBtn">экспорт</button>
+      <button class="link" id="importBtn">импорт</button>
+      <input type="file" id="fileInput" accept=".json,application/json" hidden>
+    </div>
+  </header>
+
+  <section class="hero rise" style="--d:70ms">
+    <div class="hero-label">баланс</div>
+    <div class="hero-value" id="statBalance">0 ֏</div>
+    <div class="hero-meta">
+      <span class="hm"><i class="k in"></i>доходы<b id="statIn">0 ֏</b></span>
+      <span class="hm"><i class="k out"></i>расходы<b id="statOut">0 ֏</b></span>
+      <span class="hm muted" id="statMonth">—</span>
+    </div>
+  </section>
+
+  <section class="panel add rise" style="--d:140ms">
+    <div class="seg" id="seg">
+      <button type="button" data-type="out" class="on">расход</button>
+      <button type="button" data-type="in">доход</button>
+    </div>
+
+    <form id="addForm" autocomplete="off">
+      <div class="line">
+        <div class="field amount-field">
+          <input id="amount" inputmode="decimal" placeholder="0" aria-label="Сумма">
+          <span class="suffix">֏</span>
+        </div>
+
+        <div class="field grow">
+          <input id="note" placeholder="на что потратил" maxlength="70" list="noteList" aria-label="На что">
+          <datalist id="noteList"></datalist>
+        </div>
+
+        <div class="field date-field">
+          <input type="date" id="date" aria-label="Дата">
+        </div>
+
+        <button class="btn" type="submit" id="submitBtn">добавить</button>
+      </div>
+
+      <div class="cats" id="catChips"></div>
+    </form>
+  </section>
+
+  <div class="row2">
+    <section class="panel donut-panel rise" style="--d:210ms">
+      <div class="panel-head"><span>структура расходов</span><span class="ph-muted" id="donutMonth">—</span></div>
+      <div class="donut-wrap">
+        <svg id="donut" viewBox="0 0 160 160" width="160" height="160">
+          <circle class="donut-track" cx="80" cy="80" r="58" fill="none" stroke-width="10"></circle>
+          <g transform="rotate(-90 80 80)" id="donutSegs"></g>
+          <text x="80" y="78" text-anchor="middle" class="donut-val" id="donutVal">0</text>
+          <text x="80" y="93" text-anchor="middle" class="donut-cap">расходы</text>
+        </svg>
+        <div class="legend" id="legend"></div>
+      </div>
+    </section>
+
+    <section class="panel bars-panel rise" style="--d:280ms">
+      <div class="panel-head">
+        <span>по дням</span>
+        <span class="ph-legend"><i class="k in"></i>доход<i class="k out"></i>расход</span>
+      </div>
+      <div class="bars" id="bars"></div>
+    </section>
+  </div>
+
+  <section class="panel list-panel rise" style="--d:350ms">
+    <div class="panel-head">
+      <span>история</span>
+      <div class="filters" id="filters">
+        <button data-f="all" class="on">все</button>
+        <button data-f="in">доходы</button>
+        <button data-f="out">расходы</button>
+      </div>
+    </div>
+    <div class="list" id="list"></div>
+  </section>
+
+  <footer class="foot">данные хранятся в этом браузере · делай экспорт для бэкапа</footer>
+</main>
+
+<div id="toast" class="toast"></div>
+<script src="app.js"></script>
+<script>
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function () {});
+    });
+  }
+</script>
+</body>
+</html>
