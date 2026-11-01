@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE = 'moneyflow-v2';
+const CACHE = 'moneyflow-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -13,19 +13,24 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE)
-      .then(c => c.addAll(ASSETS))
-      .then(() => self.skipWaiting())
-  );
+  e.waitUntil((async () => {
+    const cache = await caches.open(CACHE);
+    await Promise.all(ASSETS.map(async url => {
+      try {
+        const res = await fetch(new Request(url, { cache: 'reload' }));
+        if (res.ok) await cache.put(url, res);
+      } catch (err) {}
+    }));
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
-      .then(() => self.clients.claim())
-  );
+  e.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)));
+    await self.clients.claim();
+  })());
 });
 
 self.addEventListener('fetch', e => {
@@ -33,16 +38,19 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
   if (new URL(req.url).origin !== self.location.origin) return;
 
-  e.respondWith(
-    caches.match(req).then(hit => {
-      const net = fetch(req).then(res => {
+  e.respondWith((async () => {
+    const cached = await caches.match(req);
+
+    const fresh = fetch(req, { cache: 'no-store' })
+      .then(async res => {
         if (res && res.status === 200 && res.type === 'basic') {
-          const copy = res.clone();
-          caches.open(CACHE).then(c => c.put(req, copy));
+          const cache = await caches.open(CACHE);
+          cache.put(req, res.clone());
         }
         return res;
-      }).catch(() => hit || caches.match('./index.html'));
-      return hit || net;
-    })
-  );
+      })
+      .catch(() => cached || (req.mode === 'navigate' ? caches.match('./index.html') : undefined));
+
+    return cached || fresh;
+  })());
 });
